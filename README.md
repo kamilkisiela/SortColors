@@ -10,5 +10,5 @@ var list = sc.get();
 
 
 ## Supported formats:
-* HEX (with or withour 
+* HEX
 * RGB
