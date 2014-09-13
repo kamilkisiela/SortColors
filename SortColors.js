@@ -1,46 +1,43 @@
-var SortColors = (function() {
+/* 
+ * Sort Colors - sorting colors
+ * @version 1.1
+ * GIT URL - https://github.com/kamilkisiela/SortColors
+ * Author - Kamil Kisiela
+ */
 
-    var colors = [];
-
-    var regHex = /^\#?([a-z0-9]{3,6})$/i;
-
-    // add a color into array
-    function add(color) {
-        rgbColor = makeRGB(color);
-        if (rgbColor !== false)
-        {
-            colors.push({
-                "value": color,
-                "ratio": ratio(convert(rgbColor, 'rgb', 'hsv'))
-            });
-        }
-    }
-
-    // set color array
-    function set(arr) {
-        if(arr && arr.length)
-        {
-            for(var x = 0; x < arr.length; x++)
-            {
-                add(arr[x]);
-            }
-        }
-    }
+(function(SortColors, $, undefined) {
+    'use strict';
     
+    var kit = {
+        log : function(message) {
+            if ((typeof window.console !== 'undefined' && typeof window.console.log !== 'undefined') && console.debug) {
+                console.debug(message);
+            }
+        },
+        error : function(msg) {
+            kit.log('ERROR: '+msg);
+            error = true;
+        }
+    }
+
+    var colors = [],
+            error = false,
+            regHex = /^\#?([a-z0-9]{3,6})$/i;
+
     function makeRGB(color) {
         var results = regHex.exec(color);
 
         if (results && results.length)
         {
-            return convert(results[results.length-1], 'hex', 'rgb');
+            return convert(results[results.length - 1], 'hex', 'rgb');
         }
         else
         {
-            error('Not supported format: ' + color);
+            kit.error('Not supported format: ' + color);
             return false;
         }
     }
-    
+
     // convert rgb to hsv
     function rgb2hsv(rgb) {
         var rr, gg, bb,
@@ -82,7 +79,7 @@ var SortColors = (function() {
 
         return [h, s, v];
     }
-    
+
     // convert hex to rgb
     function hex2rgb(hex) {
 
@@ -90,45 +87,45 @@ var SortColors = (function() {
         var r = (bigint >> 16) & 255;
         var g = (bigint >> 8) & 255;
         var b = bigint & 255;
-        
+
         return [r, g, b];
     }
-    
+
     function convert(color, from, to) {
-        if(from && to && color) {
-            from    = from.toLowerCase();
-            to      = to.toLowerCase();
-            
-            if(from == 'hex')
+        if (from && to && color) {
+            from = from.toLowerCase();
+            to = to.toLowerCase();
+
+            if (from === 'hex')
             {
-                if(to == 'rgb')
+                if (to === 'rgb')
                 {
                     return hex2rgb(color);
                 }
                 else
                 {
-                    error('Not supported format');
+                    kit.error('Not supported format');
                 }
             }
-            else if(from == 'rgb')
+            else if (from === 'rgb')
             {
-                if(to == 'hsv')
+                if (to === 'hsv')
                 {
                     return rgb2hsv(color);
                 }
                 else
                 {
-                    error('Not supported format');
+                    kit.error('Not supported format');
                 }
             }
-            
+
         }
         else
         {
-            error('Invalid number of arguments');
+            kit.error('Invalid number of arguments');
         }
     }
-    
+
     function ratio(hsv) {
         var ratio;
         var H = hsv[0];
@@ -138,14 +135,14 @@ var SortColors = (function() {
         H /= 360;
         S /= 100;
         V /= 100;
-        
+
         ratio = H + V;
 
         return ratio;
     }
-    
+
     function sort() {
-        if(colors)
+        if (colors)
         {
             colors.sort(function(a, b)
             {
@@ -158,45 +155,77 @@ var SortColors = (function() {
                     return 1;
                 return 0;
             });
-            
+
             return true;
         }
         else
         {
-            log('Error: No colors');
+            kit.error('No colors');
             return false;
         }
     }
     
-    function get() {
-        if(sort())
+    // add a color into array
+    function add(color) {
+        var rgbColor = makeRGB(color);
+        if (rgbColor !== false)
         {
-            var original = [];
-            for(var x = 0; x < colors.length; x++)
+            colors.push({
+                "value": color,
+                "ratio": ratio(convert(rgbColor, 'rgb', 'hsv'))
+            });
+            return true;
+        }
+        return false;
+    }
+
+    // set color array
+    function set(arr) {
+        var status = true;
+        if(arr && arr.length)
+        {
+            for(var x = 0; x < arr.length; x++)
             {
-                original[x] = colors[x].value;
+                if(add(arr[x]) === false)
+                    status = false;
             }
-            return original;
         }
         else
         {
-            return false;
+            status = false;
         }
+        
+        return status;
     }
     
-    function error(msg) {
-        log('ERROR: '+msg);
+    // get sorted
+    function get() {
+        if(error === false)
+        {
+            if(sort())
+            {
+                var original = [];
+                for(var x = 0; x < colors.length; x++)
+                {
+                    original[x] = colors[x].value;
+                }
+                return original;
+            }
+        }
+        return false;
     }
+    
+    SortColors.add = function(color) {
+        return add(color);
+    };
+    
+    SortColors.set = function(arr) {
+        return set(arr);
+    };
+    
+    SortColors.get = function() {
+        return get();
+    };
 
-    function log(msg) {
-        console.debug(msg);
-    }
 
-    // define the public API
-    var API = {};
-    API.add = add;
-    API.set = set;
-    API.get = get;
-
-    return API;
-}());
+}(window.SortColors = window.SortColors || {}));
