@@ -14,3 +14,10 @@ var list = sc.get();
 * RGB (soon)
 * HSV (soon)
 * HSL (soon)
+
+
+## Available methods:
+* **add(color)** - adds color to collection
+* **set(colors)** - sets an array as collection
+* **shuffle()** - shuffles collection
+* **get()** - returns an array
