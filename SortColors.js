@@ -1,31 +1,36 @@
 /* 
  * Sort Colors - sorting colors
- * @version 1.1
+ * @version 1.3
  * GIT URL - https://github.com/kamilkisiela/SortColors
  * Author - Kamil Kisiela
  */
 
-(function(SortColors, $, undefined) {
-    'use strict';
-    
+var SortColors = (function() {
+    function SortColors(colors) {
+        this.colors = [];
+        this.error = false;
+        this.set(colors);
+    }
+
+    var regHex = /^\#?([a-z0-9]{3,6})$/i;
+
     var kit = {
-        log : function(message) {
+        log: function(message) {
             if ((typeof window.console !== 'undefined' && typeof window.console.log !== 'undefined') && console.debug) {
                 console.debug(message);
             }
         },
-        error : function(msg) {
-            kit.log('ERROR: '+msg);
+        error: function(msg) {
+            kit.log('ERROR: ' + msg);
             error = true;
+        },
+        regex: {
+            hex: /^\#?([a-z0-9]{3,6})$/i
         }
-    }
-
-    var colors = [],
-            error = false,
-            regHex = /^\#?([a-z0-9]{3,6})$/i;
+    };
 
     function makeRGB(color) {
-        var results = regHex.exec(color);
+        var results = kit.regex.hex.exec(color);
 
         if (results && results.length)
         {
@@ -141,7 +146,7 @@
         return ratio;
     }
 
-    function sort() {
+    function sort(colors) {
         if (colors)
         {
             colors.sort(function(a, b)
@@ -164,29 +169,44 @@
             return false;
         }
     }
-    
-    // add a color into array
-    function add(color) {
+
+    SortColors.prototype.shuffle = function() {
+        var currentIndex = this.colors.length, temporaryValue, randomIndex;
+
+        // While there remain elements to shuffle...
+        while (0 !== currentIndex) {
+
+            // Pick a remaining element...
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex -= 1;
+
+            // And swap it with the current element.
+            temporaryValue = this.colors[currentIndex];
+            this.colors[currentIndex] = this.colors[randomIndex];
+            this.colors[randomIndex] = temporaryValue;
+        }
+    }
+
+    SortColors.prototype.add = function(color) {
         var rgbColor = makeRGB(color);
         if (rgbColor !== false)
         {
-            colors.push({
+            this.colors.push({
                 "value": color,
                 "ratio": ratio(convert(rgbColor, 'rgb', 'hsv'))
             });
             return true;
         }
         return false;
-    }
+    };
 
-    // set color array
-    function set(arr) {
+    SortColors.prototype.set = function(arr) {
         var status = true;
-        if(arr && arr.length)
+        if (arr && arr.length)
         {
-            for(var x = 0; x < arr.length; x++)
+            for (var x = 0; x < arr.length; x++)
             {
-                if(add(arr[x]) === false)
+                if (this.add(arr[x]) === false)
                     status = false;
             }
         }
@@ -194,38 +214,25 @@
         {
             status = false;
         }
-        
+
         return status;
-    }
-    
-    // get sorted
-    function get() {
-        if(error === false)
+    };
+
+    SortColors.prototype.get = function() {
+        if (this.error === false)
         {
-            if(sort())
+            if (sort(this.colors))
             {
                 var original = [];
-                for(var x = 0; x < colors.length; x++)
+                for (var x = 0; x < this.colors.length; x++)
                 {
-                    original[x] = colors[x].value;
+                    original[x] = this.colors[x].value;
                 }
                 return original;
             }
         }
         return false;
-    }
-    
-    SortColors.add = function(color) {
-        return add(color);
-    };
-    
-    SortColors.set = function(arr) {
-        return set(arr);
-    };
-    
-    SortColors.get = function() {
-        return get();
     };
 
-
-}(window.SortColors = window.SortColors || {}));
+    return SortColors;
+})();

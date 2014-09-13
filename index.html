@@ -15,27 +15,9 @@ and open the template in the editor.
         <div id="colors"></div>
         <script src="SortColors.js" type="text/javascript"></script>
         <script>
-            function shuffle(array) {
-                var currentIndex = array.length, temporaryValue, randomIndex;
-
-                // While there remain elements to shuffle...
-                while (0 !== currentIndex) {
-
-                    // Pick a remaining element...
-                    randomIndex = Math.floor(Math.random() * currentIndex);
-                    currentIndex -= 1;
-
-                    // And swap it with the current element.
-                    temporaryValue = array[currentIndex];
-                    array[currentIndex] = array[randomIndex];
-                    array[randomIndex] = temporaryValue;
-                }
-
-                return array;
-            }
             var colors = ['EB9B1C', 'E0EB1C', '9BEB1C', '1CEB64', '1CE7EB', '1CBAEB', '1C8AEB', '000000'];
-            var sc = SortColors;
-            sc.set(shuffle(colors));
+            var sc = new SortColors(colors);
+            sc.shuffle();
             var list = sc.get();
             for (var x = 0; x < list.length; x++)
             {
